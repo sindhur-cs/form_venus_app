@@ -10,14 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@contentstack/venus-components": "^2.2.5",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@hookform/resolvers": "^3.10.0",
     "@mui/material": "^5.15.11",
     "@tailwindcss/vite": "^4.0.5",
     "crypto-js": "^4.2.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-hook-form": "^7.54.2",
     "tailwindcss": "^4.0.5",
     "zod": "^3.24.1"

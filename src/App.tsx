@@ -1,20 +1,17 @@
 import {
   FormGroup,
-  Checkbox,
   FormControlLabel,
-  Select,
-  MenuItem,
   FormControl,
   InputLabel,
-  Button,
   FormHelperText,
-  TextField,
+  Box,
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
-import { z } from 'zod';
+import { number, string, z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import CryptoJS from "crypto-js";
+import { Button, TextInput, Checkbox, Select as VenusSelect } from "@contentstack/venus-components";
 
 // Define the form schema with Zod
 const formSchema = z.object({
@@ -32,7 +29,11 @@ const formSchema = z.object({
   }).refine((data) => Object.values(data).some(Boolean), {
     message: "Please select at least one locale",
   }),
-  variant: z.string().min(1, "Please select a variant"),
+  variant: z.object({
+    id: z.number(),
+    label: z.string().min(1, "Variant is required"),
+    value: z.string().min(1, "Variant is required")
+  }),
   entryUid: z.string().min(1, "Entry UID is required"),
   contentType: z.string().min(1, "Content Type is required"),
 });
@@ -56,7 +57,11 @@ const App = () => {
         'fr-fr': false,
         'es': false,
       },
-      variant: '',
+      variant: {
+        id: 0,
+        label: "Select Variant",
+        value: ""
+      },
       entryUid: '',
       contentType: '',
     },
@@ -66,6 +71,7 @@ const App = () => {
 
   const handleButtonClick = () => {
     const data = getValues();
+    console.log(data);
     const validationResult = formSchema.safeParse(data);
 
     if (!validationResult.success) {
@@ -103,20 +109,25 @@ const App = () => {
   };
 
   return (
-    <>
-      <FormGroup className="flex flex-col gap-8 p-4 md:grid md:grid-cols-2 lg:grid-cols-3">
+    <Box sx={{ margin: "0 20px 0 5px"}}>
+      <FormGroup className="flex flex-col gap-8 p-4">
         <div className="flex flex-col gap-1">
-          <h2 className="text-lg mb-1">Select Environments</h2>
+          <h2 className="text-lg mb-1" style={{
+            color: "var(--color-brand-black-base)"
+          }}>Select Environments</h2>
           <Controller
             name="environments.production"
             control={control}
             render={({ field }) => (
               <FormControlLabel
+                style={{
+                  margin: "0px 0px 0px 6px"
+                }}
                 control={
                   <Checkbox
                     size="small"
                     checked={field.value}
-                    onChange={(e) => {
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       field.onChange(e);
                       handleFieldChange("environments");
                     }}
@@ -131,18 +142,21 @@ const App = () => {
             control={control}
             render={({ field }) => (
               <FormControlLabel
+                style={{
+                  margin: "0px 0px 0px 6px"
+                }}
                 control={
                   <Checkbox
                     size="small"
                     checked={field.value}
-                    onChange={(e) => {
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       field.onChange(e);
                       handleFieldChange("environments");
                     }}
                   />
                 }
-            label={<span className="text-sm">Staging</span>}
-          />
+                label={<span className="text-sm">Staging</span>}
+              />
             )}
           />
           <Controller
@@ -150,11 +164,14 @@ const App = () => {
             control={control}
             render={({ field }) => (
               <FormControlLabel
+                style={{
+                  margin: "0px 0px 0px 6px"
+                }}
                 control={
                   <Checkbox
                     size="small"
                     checked={field.value}
-                    onChange={(e) => {
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       field.onChange(e);
                       handleFieldChange("environments");
                     }}
@@ -165,7 +182,9 @@ const App = () => {
             )}
           />
           {formErrors.length > 0 && (
-            <FormHelperText error>{formErrors.find((error) => (error.path === "environments"))?.message}</FormHelperText>
+            <FormHelperText error style={{
+              margin: "0px 0px 0px 6px",
+            }}>{formErrors.find((error) => (error.path === "environments"))?.message}</FormHelperText>
           )}
         </div>
 
@@ -176,11 +195,14 @@ const App = () => {
             control={control}
             render={({ field }) => (
               <FormControlLabel
+                style={{
+                  margin: "0px 0px 0px 6px"
+                }}
                 control={
                   <Checkbox
                     size="small"
                     checked={field.value}
-                    onChange={(e) => {
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       field.onChange(e);
                       handleFieldChange("locales");
                     }}
@@ -195,11 +217,14 @@ const App = () => {
             control={control}
             render={({ field }) => (
               <FormControlLabel
+                style={{
+                  margin: "0px 0px 0px 6px"
+                }}
                 control={
                   <Checkbox
                     size="small"
                     checked={field.value}
-                    onChange={(e) => {
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       field.onChange(e);
                       handleFieldChange("locales");
                     }}
@@ -214,11 +239,14 @@ const App = () => {
             control={control}
             render={({ field }) => (
               <FormControlLabel
+                style={{
+                  margin: "0px 0px 0px 6px"
+                }}
                 control={
                   <Checkbox
                     size="small"
                     checked={field.value}
-                    onChange={(e) => {
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       field.onChange(e);
                       handleFieldChange("locales");
                     }}
@@ -229,95 +257,107 @@ const App = () => {
             )}
           />
           {formErrors.length > 0 && (
-            <FormHelperText error>{formErrors.find((error) => (error.path === "locales"))?.message}</FormHelperText>
+            <FormHelperText error style={{
+              margin: "0px 0px 0px 6px",
+            }}>{formErrors.find((error) => (error.path === "locales"))?.message}</FormHelperText>
           )}
         </div>
 
         <div className="flex flex-col gap-1">
           <h2 className="text-lg mb-1">Select Variant</h2>
           <FormControl size="small">
-            <InputLabel>Select variant</InputLabel>
             <Controller
               name="variant"
               control={control}
               render={({ field }) => (
-                <Select
+                //@ts-ignore
+                <VenusSelect
                   {...field}
-                  label="Select variant"
-                  onChange={(e) => {
+                  placeholder='Select Variant'
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                     field.onChange(e);
                     handleFieldChange("variant");
                   }}
-                >
-                  <MenuItem value="">Select Variant</MenuItem>
-                  <MenuItem value="business">Business Audience</MenuItem>
-                  <MenuItem value="tech">Tech Enthusiasts</MenuItem>
-                </Select>
+                  options={[
+                    {
+                      id: 0,
+                      label: "Select Variant",
+                      value: ""
+                    },
+                    {
+                      id: 1,
+                      label: "Business Audience",
+                      value: "business"
+                    },
+                    {
+                      id: 2,
+                      label: "Tech Enthusiasts",
+                      value: "tech"
+                    }
+                  ]}
+                  value={field.value}
+                />
               )}
             />
           </FormControl>
           {formErrors.length > 0 && (
-            <FormHelperText error>{formErrors.find((error) => (error.path === "variant"))?.message}</FormHelperText>
+            <FormHelperText error style={{
+              margin: "0px 0px 0px 6px",
+            }}>{formErrors.find((error) => (error.path === "variant"))?.message}</FormHelperText>
           )}
         </div>
 
         <div className="flex flex-col gap-1">
           <h2 className="text-lg mb-1">Entry uid</h2>
-          <Controller
-            name="entryUid"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Entry uid"
-                variant="outlined"
-                size="small"
-                onChange={(e) => {
-                  field.onChange(e);
-                  handleFieldChange("entryUid");
-                }}
-              />
-            )}
-          />
-        {formErrors.length > 0 && (
-          <FormHelperText error>{formErrors.find((error) => (error.path === "entryUid"))?.message}</FormHelperText>
-        )}
+            <Controller
+              name="entryUid"
+              control={control}
+              render={({ field }) => (
+                <TextInput
+                  {...field}
+                  label="Entry uid"
+                  version="v2"
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                    field.onChange(e);
+                    handleFieldChange("entryUid");
+                  }}
+                />
+              )}
+            />
+          {formErrors.length > 0 && (
+            <FormHelperText error style={{
+              margin: "0px 0px 0px 6px",
+            }}>{formErrors.find((error) => (error.path === "entryUid"))?.message}</FormHelperText>
+          )}
         </div>
 
         <div className="flex flex-col gap-1">
           <h2 className="text-lg mb-1">Content Type</h2>
-          <Controller
-            name="contentType"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Content Type"
-                variant="outlined"
-                size="small"
-                onChange={(e) => {
-                  field.onChange(e);
-                  handleFieldChange("contentType");
-                }}
-              />
-            )}
-          />
-        {formErrors.length > 0 && (
-          <FormHelperText error>{formErrors.find((error) => (error.path === "contentType"))?.message}</FormHelperText>
-        )}
+            <Controller
+              name="contentType"
+              control={control}
+              render={({ field }) => (
+                <TextInput
+                  {...field}
+                  label="Content Type"
+                  version="v2"
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                    field.onChange(e);
+                    handleFieldChange("contentType");
+                  }}
+                />
+              )}
+            />
+          {formErrors.length > 0 && (
+            <FormHelperText error style={{
+              margin: "0px 0px 0px 6px",
+            }}>{formErrors.find((error) => (error.path === "contentType"))?.message}</FormHelperText>
+          )}
         </div>
       </FormGroup>
 
-      <div className="m-4">
-        <Button
-          variant="contained"
-          size="small"
-          onClick={handleButtonClick}
-        >
-          Submit
-        </Button>
-      </div>
-    </>
+      <Button version="v2" icon="v2-FormSubmit" style={{ margin: "24px 0" }} onClick={handleButtonClick}>Submit</Button>
+    </Box>
   );
 }
 
