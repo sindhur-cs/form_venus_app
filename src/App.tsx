@@ -2,18 +2,17 @@ import {
   FormGroup,
   FormControlLabel,
   FormControl,
-  InputLabel,
   FormHelperText,
   Box,
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
-import { number, string, z } from 'zod';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChangeEvent, useState } from 'react';
 import CryptoJS from "crypto-js";
 import { Button, TextInput, Checkbox, Select as VenusSelect } from "@contentstack/venus-components";
 
-// Define the form schema with Zod
+// form schema which would be safe parsed
 const formSchema = z.object({
   environments: z.object({
     production: z.boolean(),
@@ -100,6 +99,7 @@ const App = () => {
       import.meta.env.VITE_APP_ENCRYPT_SECRET
     ).toString();
 
+    // opens a new tab or window
     window.open(`https://demo-graph.contentstackapps.com?data=${btoa(encryptedResult)}`, "_blank");
     // window.open(`http://localhost:3002?data=${btoa(encryptedResult)}`, "_blank");
   };
@@ -112,7 +112,7 @@ const App = () => {
     <Box sx={{ margin: "0 20px 0 5px"}}>
       <FormGroup className="flex flex-col gap-8 p-4">
         <div className="flex flex-col gap-1">
-          <h2 className="text-lg mb-1" style={{
+          <h2 className="text-lg mb-1 tracking-wide" style={{
             color: "var(--color-brand-black-base)"
           }}>Select Environments</h2>
           <Controller
@@ -121,7 +121,8 @@ const App = () => {
             render={({ field }) => (
               <FormControlLabel
                 style={{
-                  margin: "0px 0px 0px 6px"
+                  margin: "0px 0px 0px 6px",
+                  color: "var(--color-font-text-primary-text-purple-gray)"
                 }}
                 control={
                   <Checkbox
@@ -143,7 +144,8 @@ const App = () => {
             render={({ field }) => (
               <FormControlLabel
                 style={{
-                  margin: "0px 0px 0px 6px"
+                  margin: "0px 0px 0px 6px",
+                  color: "var(--color-font-text-primary-text-purple-gray)"
                 }}
                 control={
                   <Checkbox
@@ -165,7 +167,8 @@ const App = () => {
             render={({ field }) => (
               <FormControlLabel
                 style={{
-                  margin: "0px 0px 0px 6px"
+                  margin: "0px 0px 0px 6px",
+                  color: "var(--color-font-text-primary-text-purple-gray)"
                 }}
                 control={
                   <Checkbox
@@ -189,14 +192,17 @@ const App = () => {
         </div>
 
         <div className="flex flex-col gap-1">
-          <h2 className="text-lg mb-1">Select Locales</h2>
+          <h2 className="text-lg mb-1 tracking-wide" style={{
+            color: "var(--color-brand-black-base)"
+          }}>Select Locales</h2>
           <Controller
             name="locales.en-us"
             control={control}
             render={({ field }) => (
               <FormControlLabel
                 style={{
-                  margin: "0px 0px 0px 6px"
+                  margin: "0px 0px 0px 6px",
+                  color: "var(--color-font-text-primary-text-purple-gray)"
                 }}
                 control={
                   <Checkbox
@@ -218,7 +224,8 @@ const App = () => {
             render={({ field }) => (
               <FormControlLabel
                 style={{
-                  margin: "0px 0px 0px 6px"
+                  margin: "0px 0px 0px 6px",
+                  color: "var(--color-font-text-primary-text-purple-gray)"
                 }}
                 control={
                   <Checkbox
@@ -240,7 +247,8 @@ const App = () => {
             render={({ field }) => (
               <FormControlLabel
                 style={{
-                  margin: "0px 0px 0px 6px"
+                  margin: "0px 0px 0px 6px",
+                  color: "var(--color-font-text-primary-text-purple-gray)"
                 }}
                 control={
                   <Checkbox
@@ -264,8 +272,12 @@ const App = () => {
         </div>
 
         <div className="flex flex-col gap-1">
-          <h2 className="text-lg mb-1">Select Variant</h2>
-          <FormControl size="small">
+          <h2 className="text-lg mb-1 tracking-wide" style={{
+            color: "var(--color-brand-black-base)"
+          }}>Select Variant</h2>
+          <FormControl size="small" style={{
+            color: "var(--color-font-text-primary-text-purple-gray)"
+          }}>
             <Controller
               name="variant"
               control={control}
@@ -308,7 +320,9 @@ const App = () => {
         </div>
 
         <div className="flex flex-col gap-1">
-          <h2 className="text-lg mb-1">Entry uid</h2>
+          <h2 className="text-lg mb-1 tracking-wide" style={{
+            color: "var(--color-brand-black-base)"
+          }}>Entry uid</h2>
             <Controller
               name="entryUid"
               control={control}
@@ -317,6 +331,9 @@ const App = () => {
                   {...field}
                   label="Entry uid"
                   version="v2"
+                  style={{
+                    color: "var(--color-font-text-primary-text-purple-gray)"
+                  }}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     field.onChange(e);
                     handleFieldChange("entryUid");
@@ -332,7 +349,9 @@ const App = () => {
         </div>
 
         <div className="flex flex-col gap-1">
-          <h2 className="text-lg mb-1">Content Type</h2>
+          <h2 className="text-lg mb-1 tracking-wide" style={{
+            color: "var(--color-brand-black-base)"
+          }}>Content Type</h2>
             <Controller
               name="contentType"
               control={control}
@@ -341,6 +360,9 @@ const App = () => {
                   {...field}
                   label="Content Type"
                   version="v2"
+                  style={{
+                    color: "var(--color-font-text-primary-text-purple-gray)"
+                  }}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     field.onChange(e);
                     handleFieldChange("contentType");
