@@ -8,9 +8,10 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import CryptoJS from "crypto-js";
-import { Button, TextInput, Checkbox, Select as VenusSelect } from "@contentstack/venus-components";
+import { Button, Checkbox, Select as VenusSelect } from "@contentstack/venus-components";
+import ContentStackAppSDK from "@contentstack/app-sdk";
 
 // form schema which would be safe parsed
 const formSchema = z.object({
@@ -32,9 +33,7 @@ const formSchema = z.object({
     id: z.number(),
     label: z.string().min(1, "Variant is required"),
     value: z.string().min(1, "Variant is required")
-  }),
-  entryUid: z.string().min(1, "Entry UID is required"),
-  contentType: z.string().min(1, "Content Type is required"),
+  })
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -60,15 +59,21 @@ const App = () => {
         id: 0,
         label: "Select Variant",
         value: ""
-      },
-      entryUid: '',
-      contentType: '',
+      }
     },
   });
+
+  const [entryUid, setEntryUid] = useState("");
+  const [contentType, setContentType] = useState("");
+  const [stackAPI, setStackAPI] = useState("");
 
   const [formErrors, setFormErrors] = useState<{ path: string, message: string }[]>([]);
 
   const handleButtonClick = () => {
+    if(!entryUid || !contentType || !stackAPI) {
+      alert("Entry Uid or Content type or Stack API could not be retrieved");
+      return;
+    }
     const data = getValues();
     console.log(data);
     const validationResult = formSchema.safeParse(data);
@@ -90,15 +95,18 @@ const App = () => {
         .filter(([_, selected]) => selected)
         .map(([locale]) => locale),
       variant: data.variant,
-      entryUid: data.entryUid,
-      contentType: data.contentType,
+      entryUid,
+      contentType,
+      stackAPI
     };
-
+    
+    // encrypt the result
     const encryptedResult = CryptoJS.AES.encrypt(
       JSON.stringify(result),
       import.meta.env.VITE_APP_ENCRYPT_SECRET
     ).toString();
 
+    // convert to base64
     // opens a new tab or window
     window.open(`https://demo-graph.contentstackapps.com?data=${btoa(encryptedResult)}`, "_blank");
     // window.open(`http://localhost:3002?data=${btoa(encryptedResult)}`, "_blank");
@@ -108,8 +116,17 @@ const App = () => {
     setFormErrors((prevErrors) => prevErrors.filter(error => error.path !== fieldName));
   };
 
+  useEffect(() => {
+    ContentStackAppSDK.init().then((appSdk) => {
+      const parentWindow = appSdk.location.SidebarWidget;
+      setContentType(parentWindow?.entry.content_type.uid || "");
+      setEntryUid(parentWindow?.entry._data.uid || "");
+      setStackAPI(parentWindow?.stack._data.api_key || "");
+    });
+  }, []);
+
   return (
-    <Box sx={{ margin: "0 20px 0 5px"}}>
+    <Box sx={{ margin: "0 20px 0 5px", padding: "20px" }}>
       <FormGroup className="flex flex-col gap-8 p-4">
         <div className="flex flex-col gap-1">
           <h2 className="text-lg mb-1 tracking-wide" style={{
@@ -316,64 +333,6 @@ const App = () => {
             <FormHelperText error style={{
               margin: "0px 0px 0px 6px",
             }}>{formErrors.find((error) => (error.path === "variant"))?.message}</FormHelperText>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <h2 className="text-lg mb-1 tracking-wide" style={{
-            color: "var(--color-brand-black-base)"
-          }}>Entry uid</h2>
-            <Controller
-              name="entryUid"
-              control={control}
-              render={({ field }) => (
-                <TextInput
-                  {...field}
-                  label="Entry uid"
-                  version="v2"
-                  style={{
-                    color: "var(--color-font-text-primary-text-purple-gray)"
-                  }}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    field.onChange(e);
-                    handleFieldChange("entryUid");
-                  }}
-                />
-              )}
-            />
-          {formErrors.length > 0 && (
-            <FormHelperText error style={{
-              margin: "0px 0px 0px 6px",
-            }}>{formErrors.find((error) => (error.path === "entryUid"))?.message}</FormHelperText>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <h2 className="text-lg mb-1 tracking-wide" style={{
-            color: "var(--color-brand-black-base)"
-          }}>Content Type</h2>
-            <Controller
-              name="contentType"
-              control={control}
-              render={({ field }) => (
-                <TextInput
-                  {...field}
-                  label="Content Type"
-                  version="v2"
-                  style={{
-                    color: "var(--color-font-text-primary-text-purple-gray)"
-                  }}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    field.onChange(e);
-                    handleFieldChange("contentType");
-                  }}
-                />
-              )}
-            />
-          {formErrors.length > 0 && (
-            <FormHelperText error style={{
-              margin: "0px 0px 0px 6px",
-            }}>{formErrors.find((error) => (error.path === "contentType"))?.message}</FormHelperText>
           )}
         </div>
       </FormGroup>
