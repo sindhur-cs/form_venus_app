@@ -108,7 +108,7 @@ const App = () => {
 
     // convert to base64
     // opens a new tab or window
-    window.open(`https://demo-graph.contentstackapps.com?data=${btoa(encryptedResult)}`, "_blank");
+    window.open(`https://demo-graph-refactored.contentstackapps.com/?data=${btoa(encryptedResult)}`, "_blank");
     // window.open(`http://localhost:3002?data=${btoa(encryptedResult)}`, "_blank");
   };
 
